@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+          <h4 class="mb-0 text-primary">
+            <i class="fas fa-inbox me-2"></i>Inbox
+          </h4>
+          <a href="{{ url_for('explore_page') }}" class="btn btn-outline-primary btn-sm rounded-pill">
+            <i class="fas fa-plus me-1"></i>New Message
+          </a>
+        </div>
+
+        <div class="list-group list-group-flush">
+          {% for msg in messages.items %}
+          {% include '_inbox_item.html' %}
+          {% else %}
+          <div class="text-center py-5">
+            <i class="fas fa-envelope-open fa-3x text-muted mb-3 opacity-50"></i>
+            <p class="text-muted mb-0">No messages yet.</p>
+            <small class="text-muted">Start a conversation from the Explore page!</small>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if prev_url or next_url %}
+        <div class="card-footer bg-white py-3">
+          <nav aria-label="Message navigation">
+            <ul class="pagination justify-content-center mb-0">
+              <li class="page-item {% if not prev_url %}disabled{% endif %}">
+                <a class="page-link rounded-pill px-3 me-2" href="{{ prev_url or '#' }}">
+                  <i class="fas fa-chevron-left me-1"></i> Newer
+                </a>
+              </li>
+              <li class="page-item {% if not next_url %}disabled{% endif %}">
+                <a class="page-link rounded-pill px-3" href="{{ next_url or '#' }}">
+                  Older <i class="fas fa-chevron-right ms-1"></i>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

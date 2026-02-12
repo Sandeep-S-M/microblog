@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0 rounded-4 overflow-hidden"
+        style="height: 80vh; display: flex; flex-direction: column;">
+
+        <!-- Chat Header -->
+        <div class="card-header bg-primary text-white p-3 border-0 d-flex align-items-center">
+          <a href="{{ url_for('profile_page', username=recipient.username) }}"
+            class="text-white text-decoration-none d-flex align-items-center">
+            <img src="{{ recipient.avatar(50) }}" class="rounded-circle border border-2 border-white me-3"
+              style="width: 45px; height: 45px;">
+            <div>
+              <h5 class="mb-0 fw-bold">{{ recipient.username }}</h5>
+              {% if recipient.last_seen %}
+              <small class="opacity-75" style="font-size: 0.8rem;">Last seen {{ moment(recipient.last_seen).fromNow()
+                }}</small>
+              {% endif %}
+            </div>
+          </a>
+        </div>
+
+        <!-- Chat Body (Scrollable) -->
+        <div class="card-body bg-light p-4" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column;"
+          id="chat-box">
+          {% for msg in messages %}
+          {% include '_message.html' %}
+          {% else %}
+          <div class="text-center text-muted my-auto">
+            <i class="fas fa-comments fa-3x mb-3 text-secondary opacity-50"></i>
+            <p>No messages yet. Start the conversation!</p>
+          </div>
+          {% endfor %}
+          <div id="bottom"></div>
+        </div>
+
+        <!-- Chat Input Area -->
+        <div class="card-footer bg-white p-3 border-top">
+          <form action="" method="post" class="d-flex gap-2" id="message-form" onsubmit="return handleSubmit(this)">
+            {{ form.hidden_tag() }}
+            <div class="flex-grow-1">
+              {{ form.message(class="form-control rounded-pill border-0 bg-light py-2 px-4 msg-input",
+              placeholder="Type a message...", style="box-shadow: none;", autocomplete="off", id="message-input") }}
+            </div>
+            <button type="submit" id="send-btn"
+              class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+              style="width: 45px; height: 45px;">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Custom Scrollbar */
+    #chat-box::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chat-box::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    #chat-box::-webkit-scrollbar-thumb {
+      background: #ced4da;
+      border-radius: 10px;
+    }
+
+    #chat-box::-webkit-scrollbar-thumb:hover {
+      background: #aab2bd;
+    }
+
+    .msg-input:focus {
+      background: #fff !important;
+      box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25) !important;
+    }
+  </style>
+
+  <script>
+    let isSubmitting = false;
+    function handleSubmit(form) {
+      if (isSubmitting) return false;
+      const messageInput = document.getElementById('message-input');
+      if (!messageInput.value.trim()) return false;
+
+      isSubmitting = true;
+      const sendBtn = document.getElementById('send-btn');
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      return true;
+    }
+
+    // FIXED: Use MESSAGE IDs instead of timestamps (unique!)
+    (function () {
+      const chatBox = document.getElementById("chat-box");
+      const recipient = "{{ recipient.username }}";
+
+      // Track RENDERED MESSAGE IDs (UNIQUE!)
+      const renderedMessageIds = new Set();
+
+      // Collect server-rendered message IDs
+      {% for msg in messages %}
+      renderedMessageIds.add({{ msg.id }});
+    {% endfor %}
+
+    // Get latest timestamp for polling
+    let latestTimestamp = {{ messages[-1].timestamp.timestamp() if messages else 0 }};
+
+    window.onload = function () {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    };
+
+    function fetchUpdates() {
+      fetch(`/api/chat_updates/${recipient}?timestamp=${latestTimestamp}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.updates.length > 0) {
+            const wasAtBottom = chatBox.scrollHeight - chatBox.scrollTop <= chatBox.clientHeight + 1;
+
+            data.updates.forEach(update => {
+              // CHECK MESSAGE ID (not timestamp!) - 100% DUPLICATE-PROOF
+              if (!renderedMessageIds.has(update.id)) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = update.html;
+
+                const bottomAnchor = document.getElementById('bottom');
+                chatBox.insertBefore(tempDiv.firstElementChild, bottomAnchor);
+
+                // Track this UNIQUE message ID
+                renderedMessageIds.add(update.id);
+                latestTimestamp = Math.max(latestTimestamp, update.timestamp);
+              }
+            });
+
+            if (wasAtBottom) {
+              chatBox.scrollTop = chatBox.scrollHeight;
+            }
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Poll every 5 seconds
+    setInterval(fetchUpdates, 5000);
+}) ();
+  </script>
+
+</div>
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Header -->
+    <div class="text-center mb-5">
+        <div class="avatar-container position-relative d-inline-block mb-4">
+            <div class="avatar-bg">
+                <i class="fas fa-user-circle fs-1 text-white"></i>
+            </div>
+        </div>
+        <h1 class="display-5 fw-bold bg-gradient-text mb-2">Hi, {{ current_user.username }}!</h1>
+        <p class="lead text-muted mb-5">Your Microblog feed ✨</p>
+    </div>
+
+    <!-- Create Post Section (Conditional) -->
+    {% if form %}
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card create-post-card shadow-lg border-0 overflow-hidden mb-5" style="border-radius: 20px;">
+                <div class="card-header bg-gradient-primary text-blue text-center py-4 position-relative">
+                    <h3 class="h5 mb-1 fw-bold position-relative">✍️ What's on your mind?</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form action="" method="post" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-4">
+                            {{ form.post.label(class="form-label fw-semibold text-dark mb-2") }}
+                            {{ form.post(cols=32, rows=4, class="form-control post-textarea shadow-sm",
+                            placeholder="Share your thoughts with the community...") }}
+                            {% for error in form.post.errors %}
+                            <div class="alert alert-danger small mt-2 py-2 d-flex align-items-center">
+                                <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="text-center">
+                            {{ form.submit(class="btn btn-success btn-lg px-5 py-2 fw-bold shadow-lg") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Posts Feed -->
+    <div class="posts-feed">
+        {% for post in posts %}
+        {% include "_post.html" %}
+        {% endfor %}
+    </div>
+
+    <!-- Bootstrap Pagination (Styled) -->
+    <nav aria-label="Post navigation">
+        <ul class="pagination">
+            <li class="page-item{% if not prev_url %} disabled{% endif %}">
+                <a class="page-link" href="{{ prev_url }}">
+                    <span aria-hidden="true">&larr;</span> Newer posts
+                </a>
+            </li>
+            <li class="page-item{% if not next_url %} disabled{% endif %}">
+                <a class="page-link" href="{{ next_url }}">
+                    Older posts <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
+{% endblock %}
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Avatar */
+    .avatar-container {
+        width: 120px;
+        height: 120px;
+    }
+
+    .avatar-bg {
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--card-shadow);
+        transition: all 0.4s ease;
+    }
+
+    .avatar-bg:hover {
+        transform: scale(1.1);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Gradient Text */
+    .bg-gradient-text {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Post Form */
+    .post-textarea {
+        resize: vertical;
+        min-height: 120px;
+        border-radius: 15px;
+        border: 2px solid #e9ecef;
+        padding: 1.25rem;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        background: #fafbfc;
+    }
+
+    .post-textarea:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+        background: #fff;
+        transform: translateY(-1px);
+    }
+
+    /* Cards */
+    .create-post-card {
+        transition: all 0.4s ease;
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    }
+
+    .create-post-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* Bootstrap Pagination - Custom Styled */
+    .pagination-custom {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        border-radius: 50px;
+        overflow: hidden;
+        background: white;
+        padding: 4px;
+        margin: 0;
+    }
+
+    .page-link-custom {
+        border: none !important;
+        border-radius: 25px !important;
+        padding: 12px 20px !important;
+        margin: 2px !important;
+        font-weight: 600 !important;
+        color: #667eea !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        text-decoration: none !important;
+    }
+
+    .page-link-custom:hover:not(.disabled) {
+        background: var(--primary-gradient) !important;
+        color: white !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3) !important;
+    }
+
+    .page-item.disabled .page-link-custom {
+        opacity: 0.5;
+        cursor: not-allowed;
+        color: #6c757d !important;
+    }
+
+    .posts-feed {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .avatar-container {
+            width: 100px;
+            height: 100px;
+        }
+
+        .pagination-custom {
+            padding: 2px;
+        }
+
+        .page-link-custom {
+            padding: 10px 16px !important;
+            font-size: 0.95rem !important;
+        }
+    }
+</style>

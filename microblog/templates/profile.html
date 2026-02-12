@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center mb-5">
+        <!-- Profile Card -->
+        <div class="col-lg-8 col-xl-6">
+            <div class="card shadow-xl border-0 overflow-hidden profile-card"
+                style="border-radius: 25px; max-width: 650px;">
+                <!-- Profile Header -->
+                <div class="position-relative overflow-hidden">
+                    <div class="profile-cover bg-gradient-primary py-5"></div>
+                    <div class="profile-avatar position-absolute"
+                        style="top: 60%; left: 50%; transform: translate(-50%, -50%);">
+                        <img src="{{ user.avatar(128) }}"
+                            class="avatar-xl rounded-circle shadow-lg border border-4 border-white">
+                    </div>
+                </div>
+
+                <!-- Profile Content -->
+                <div class="card-body pt-5 pb-4 px-4 
+                text-center">
+
+                    <h1 class="h2 fw-bold text-dark mb-2 lh-1">{{ user.username }}</h1>
+
+                    {% if user.about_me %}
+                    <p class="lead text-muted mb-4 px-3">{{ user.about_me }}</p>
+                    {% endif %}
+
+                    {% if user.last_seen %}
+                    <p class="text-muted mb-4">
+                        Last seen on: {{ moment(user.last_seen).format('LLL') }}
+                    </p>
+                    {% endif %}
+
+                    <!-- Stats & Actions -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="stat-card p-3 rounded-3 bg-light">
+                                <span class="h5 fw-bold text-primary">{{ user.followers_count() }}</span>
+                                <small class="text-muted d-block">Followers</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-card p-3 rounded-3 bg-light">
+                                <span class="h5 fw-bold text-primary">{{ user.following_count() }}</span>
+                                <small class="text-muted d-block">Following</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        {% if user == current_user %}
+                        <a href="{{ url_for('edit_profile') }}"
+                            class="btn btn-outline-primary px-4 py-2 fw-semibold me-2">
+                            <i class="fas fa-edit me-1"></i>Edit Profile
+                        </a>
+                        {% elif not current_user.is_following(user) %}
+                        <form action="{{ url_for('follow', username=user.username) }}" method="post" class="d-inline">
+                            {{ form.hidden_tag() }}
+                            {{ form.submit(class="btn btn-primary px-4 py-2 fw-semibold shadow-sm", value='Follow') }}
+                        </form>
+                        <a href="{{ url_for('send_message', recipient=user.username) }}"
+                            class="btn btn-outline-primary px-4 py-2 fw-semibold shadow-sm ms-2">
+                            <i class="fas fa-envelope me-1"></i>Message
+                        </a>
+                        {% else %}
+                        <form action="{{ url_for('unfollow', username=user.username) }}" method="post" class="d-inline">
+                            {{ form.hidden_tag() }}
+                            {{ form.submit(class="btn btn-outline-secondary px-4 py-2 fw-semibold shadow-sm",
+                            value='Unfollow') }}
+                        </form>
+                        <a href="{{ url_for('send_message', recipient=user.username) }}"
+                            class="btn btn-outline-primary px-4 py-2 fw-semibold shadow-sm ms-2">
+                            <i class="fas fa-envelope me-1"></i>Message
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posts Section -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            {% for post in posts %}
+            {% include '_post.html' %}
+            {% endfor %}
+
+            <!-- Pagination -->
+            <nav aria-label="Post navigation">
+                <ul class="pagination">
+                    <li class="page-item{% if not prev_url %} disabled{% endif %}">
+                        <a class="page-link" href="{{ prev_url }}">
+                            <span aria-hidden="true">&larr;</span> Newer posts
+                        </a>
+                    </li>
+                    <li class="page-item{% if not next_url %} disabled{% endif %}">
+                        <a class="page-link" href="{{ next_url }}">
+                            Older posts <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .profile-cover {
+        background: var(--primary-gradient);
+        transform: skewY(-2deg);
+        margin-top: -1px;
+    }
+
+    .avatar-xl {
+        width: 140px !important;
+        height: 140px !important;
+        border-width: 5px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        object-fit: cover;
+    }
+
+    .avatar-xl:hover {
+        transform: scale(1.05);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .profile-card {
+        transition: all 0.5s ease;
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    }
+
+    .profile-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .stat-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+        cursor: pointer;
+    }
+
+    .stat-card:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .stat-card:hover * {
+        color: inherit !important;
+    }
+
+    .pagination-container {
+        display: inline-flex;
+        gap: 0;
+        align-items: center;
+    }
+
+    .pagination-btn {
+        padding: 12px 24px;
+        border-radius: 50px;
+        border: 2px solid #667eea;
+        background: white;
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .pagination-btn:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }

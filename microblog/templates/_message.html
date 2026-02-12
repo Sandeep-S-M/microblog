@@ -1,0 +1,18 @@
+<div
+  class="d-flex mb-3 {% if msg.sender_id == current_user.id %}justify-content-end{% else %}justify-content-start{% endif %}">
+  {% if msg.sender_id != current_user.id %}
+  <a href="{{ url_for('profile_page', username=msg.author.username) }}" class="text-decoration-none">
+    <img src="{{ msg.author.avatar(30) }}" class="rounded-circle me-2 align-self-end mb-1"
+      style="width: 30px; height: 30px;" alt="{{ msg.author.username }}">
+  </a>
+  {% endif %}
+
+  <div class="message-bubble p-3 shadow-sm"
+    style="max-width: 75%; border-radius: 20px; {{ 'border-bottom-right-radius: 0; background: #dcf8c6; color: #000;' if msg.sender_id == current_user.id else 'border-bottom-left-radius: 0; background: #fff;' }}">
+    <p class="mb-1">{{ msg.body }}</p>
+    <div class="text-end">
+      <small class="text-muted" style="font-size: 0.65rem;">{{moment(msg.timestamp).format('LT') }}
+      </small>
+    </div>
+  </div>
+</div>

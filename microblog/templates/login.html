@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}  {% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-start min-vh-100 pt-5 pb-5">
+    <div class="card shadow-lg border-0" style="max-width: 380px; width: 100%;">
+        <!-- Card Header -->
+        <div class="card-header bg-primary text-white text-center py-3 border-0">
+            <h2 class="h4 mb-1 fw-bold">Welcome Back</h2>
+            <p class="mb-0 small opacity-75">Sign in to your account</p>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body p-3 p-md-4">
+            <form action="" method="POST" novalidate>
+                {{ form.hidden_tag() }}
+                
+                <!-- Username Field -->
+                <div class="mb-3">
+                    {{ form.username.label(class="form-label fw-semibold text-muted small") }}
+                    {{ form.username(class="form-control form-control-sm", size=32, placeholder="Username") }}
+                    {% for error in form.username.errors %}
+                        <div class="text-danger xsmall mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-3">
+                    {{ form.password.label(class="form-label fw-semibold text-muted small") }}
+                    {{ form.password(class="form-control form-control-sm", size=32, placeholder="Password") }}
+                    {% for error in form.password.errors %}
+                        <div class="text-danger xsmall mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Remember Me -->
+                <div class="mb-3 d-flex align-items-center">
+                    {{ form.remember_me(class="form-check-input me-2") }}
+                    <label class="form-check-label xsmall text-muted">Remember Me</label>
+                </div>
+
+                <!-- Sign In Button -->
+                <div class="mb-3 text-center">
+                    {{ form.submit(class="btn btn-primary px-4 py-1 fw-bold shadow-sm") }}
+                  <br>
+                  <p class="mb-0 small text-muted">
+                <a href="{{ url_for('reset_password_request') }}" class="text-decoration-none text-primary fw-semibold">
+                    Forgot Password
+                </a>
+            </p>
+                </div>
+            </form>
+        </div>
+
+      
+    </div>
+</div>
+{% endblock %}

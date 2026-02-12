@@ -1,0 +1,64 @@
+{% block content %}
+<div class="post-card-container">
+    <div class="post-card shadow-sm border-0 rounded-3 p-4 mb-4" style="background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+        <!-- Avatar & Author -->
+        <div class="d-flex align-items-start mb-3">
+            <a href="{{ url_for('profile_page', username=post.author.username) }}" class="me-3">
+                <img src="{{ post.author.avatar(70) }}" 
+                     class="rounded-circle avatar-lg shadow-sm" 
+                     alt="{{ post.author.username }}" 
+                     style="width: 60px; height: 60px; object-fit: cover;">
+            </a>
+            <div class="flex-grow-1 min-width-0">
+                <a href="{{ url_for('profile_page', username=post.author.username) }}" 
+                   class="h6 text-decoration-none fw-bold text-dark mb-1 d-block">
+                    {{ post.author.username }}
+                </a>
+                <span class="text-muted small">said on: {{ moment(post.timestamp).fromNow() }}:</span>
+            </div>
+        </div>
+         
+        <!-- Post Body -->
+        <div class="post-body mt-2">
+            <p class="mb-0 lh-lg text-dark fw-medium">{{ post.body }}</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .post-card-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .avatar-lg {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 3px solid #e9ecef;
+    }
+    
+    .avatar-lg:hover {
+        transform: translateY(-3px) scale(1.05);
+        border-color: #667eea;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2) !important;
+    }
+    
+    .post-card {
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+        backdrop-filter: blur(10px);
+    }
+    
+    .post-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important;
+        border-left-color: #667eea;
+    }
+    
+    @media (max-width: 768px) {
+        .post-card {
+            margin-left: 1rem;
+            margin-right: 1rem;
+        }
+    }
+</style>
+{% endblock %}

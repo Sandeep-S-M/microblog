@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <!-- Edit Profile Card -->
+            <div class="card shadow-lg border-0 overflow-hidden" style="max-width: 650px; border-radius: 25px;">
+                <!-- Header -->
+                <div class="card-header bg-gradient-primary text-white text-center py-5 position-relative overflow-hidden">
+                    <div class="position-absolute top-0 start-0 w-100 h-100 bg-white opacity-5 skew-x-12"></div>
+                    <div class="position-relative">
+                        <i class="fas fa-user-edit fs-1 mb-3 opacity-90"></i>
+                        <h1 class="h3 mb-1 fw-bold">Edit Profile</h1>
+                        <p class="mb-0 small opacity-90">Update your personal information</p>
+                    </div>
+                </div>
+
+                <!-- Form Body -->
+                <div class="card-body p-5">
+                    <form action="" method="post" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Username Field -->
+                        <div class="mb-4">
+                            <label class="form-label h6 fw-bold text-dark mb-3">{{ form.username.label }}</label>
+                            {{ form.username(class="form-control form-control-lg shadow-sm", size=32, placeholder="Enter your username") }}
+                            {% for error in form.username.errors %}
+                                <div class="alert alert-danger small mt-2 py-2 d-flex align-items-center">
+                                    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- About Me Field -->
+                        <div class="mb-5">
+                            <label class="form-label h6 fw-bold text-dark mb-3">{{ form.about_me.label }}</label>
+                            {{ form.about_me(class="form-control shadow-sm", cols=50, rows=5, placeholder="Tell us about yourself...") }}
+                            {% for error in form.about_me.errors %}
+                                <div class="alert alert-danger small mt-2 py-2 d-flex align-items-center">
+                                    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 justify-content-center flex-wrap">
+                            {{ form.submit(class="btn btn-success btn-lg px-5 py-3 fw-bold shadow-lg") }}
+                            <a href="{{ url_for('profile_page', username=current_user.username) }}" 
+                               class="btn btn-outline-secondary btn-lg px-5 py-3 fw-bold">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        --card-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    }
+
+    .bg-gradient-primary {
+        background: var(--primary-gradient) !important;
+        position: relative;
+    }
+
+    .form-control, .form-control:focus {
+        border-radius: 15px;
+        border: 2px solid #e9ecef;
+        padding: 1.25rem;
+        font-size: 1.1rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102,126,234,0.2), 0 8px 25px rgba(102,126,234,0.15) !important;
+        transform: translateY(-2px);
+        background: #fff;
+    }
+
+    .form-control:hover {
+        border-color: #dee2e6;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    .btn-success {
+        background: var(--success-gradient);
+        border: none;
+        border-radius: 50px;
+        position: relative;
+        overflow: hidden;
+        min-width: 140px;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(17,153,142,0.4);
+    }
+
+    .btn-success:active {
+        transform: scale(0.98);
+    }
+
+    .btn-outline-secondary {
+        border-radius: 50px;
+        border-width: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(108,117,125,0.3);
+    }
+
+    .card {
+        transition: all 0.5s ease;
+        background: linear-gradient(145deg, #ffffff, #f8faff);
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--card-shadow) !important;
+    }
+
+    @media (max-width: 768px) {
+        .card-body { padding: 2rem 1.5rem !important; }
+        .form-control { font-size: 1rem; padding: 1rem; }
+        .action-buttons { flex-direction: column; }
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
