@@ -1,4 +1,8 @@
-# microblog (corey_scafer_Flask)
+# microblog service
+# feautures 
+-> multiple connection with eachother and maintaining followers as well as following options 
+-> Elastic search is used to find the content in the pages
+->JWT tokens to confirm the client to modify their profile or to get an access
 
 Quick setup and test instructions for Windows (cmd.exe)
 
